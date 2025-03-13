@@ -34,7 +34,7 @@ export class GameObject {
     frameNumber = 0;
     alpha = 1;
 
-    constructor(sprite) {
+    constructor(sprite = null) {
         try {
             this.id = generateUUID();
             if (sprite instanceof Sprite) {

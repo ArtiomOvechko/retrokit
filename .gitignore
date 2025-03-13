@@ -1,5 +1,1 @@
-**/node_modules
-**/dist
-server/dns-buddy/package-lock.json
-**/local.config
 .idea
