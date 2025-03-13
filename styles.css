@@ -1,0 +1,109 @@
+@font-face {
+    font-family: "beampie-pixel";
+    src: url("/fonts/BeampiePixelV77_rc2.otf");
+}
+
+.game-surface {
+    background-color: rgb(57, 66, 107);
+    /*background-color: rgb(255, 66, 107);*/
+    display: flex;
+}
+
+.game-surface-wrapper {
+    position: relative;
+}
+
+.background, body {
+    background-color: rgb(57, 66, 107);
+    overflow: hidden;
+}
+
+body {
+    margin: 0;
+}
+
+.no-select {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.message {
+    font-size: 30px;
+}
+
+.message-button {
+    display: flex !important;
+    flex-direction: row;
+    align-items: start;
+    justify-content: center;
+    width: 10000px;
+    height: 10000px;
+}
+
+.list {
+    font-size: 45px;
+}
+
+.name {
+    font-size: 45px;
+    display: flex !important;
+    flex-direction: row;
+    align-items: start;
+    justify-content: center;
+    width: 10000px;
+    height: 10000px;
+}
+
+.title {
+    font-size: 60px;
+}
+
+.long {
+    font-size: 24px !important;
+}
+
+.very-long {
+    font-size: 20px !important;
+}
+
+.text {
+    font-family: 'beampie-pixel',sans-serif;
+    display: inline-block;
+    text-wrap: nowrap;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+    border: none;
+    border-block: transparent;
+    border-left-color: rgba(255, 255, 255, 0) !important;
+    border-right-color: rgba(255, 255, 255, 0) !important;
+    border-bottom-color: rgba(255, 255, 255, 0) !important;
+    border-top-color: rgba(255, 255, 255, 0) !important;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    _::-webkit-full-page-media, _:future, :root ,
+    .text {
+        vertical-align: top;
+        line-height: 3;
+        margin-top: -21px;
+    }
+}
+

@@ -1,0 +1,1 @@
+import * as startup from "src/startup.js";
