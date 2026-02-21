@@ -75,7 +75,7 @@ No build step is required.
 Objects render through the viewport by default.
 For UI elements, set:
 
-object.useViewport = false;
+this.gui = true;
 
 ---
 
