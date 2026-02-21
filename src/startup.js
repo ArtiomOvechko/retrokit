@@ -20,7 +20,7 @@ await InitGame(async () => {
     // Define sprites and sound assets here to reuse them later anywhere (when using them by game objects)
     runtime.spritesDefinition = {
         princess: { // A sample sprite, feel free to define your own nesting structure
-            walking: new Sprite('./sprites/princess.png', 16, 16, 14, 2),
+            walking: new Sprite('./sprites/princess.png', 15, 15, 10, 2),
         }, tiles: {
             square: new Sprite('./sprites/square-tile.png', 1, 1, 1, 1),
         }

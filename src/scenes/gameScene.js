@@ -1,86 +1,116 @@
-import { runtime, Scene} from "../../retrokit/core.js";
-import {DynamicImageButton} from "../../retrokit/io/button.js";
-import {Princess} from "../gameObjects/princess.js";
+import { runtime, Scene } from "../../retrokit/core.js";
+import { DynamicImageButton } from "../../retrokit/io/button.js";
+import { Princess } from "../gameObjects/princess.js";
 import Tile from "../gameObjects/tile.js";
-import {addText, positionText, Text, TextType} from "../../retrokit/io/text.js";
+import { addText, positionText, TextType } from "../../retrokit/io/text.js";
+import { PlatformerViewport } from "../gameObjects/PlatformerViewport.js";
 
 export class GameScene extends Scene {
     constructor() {
-        super({ vpWidth: 128 }); // we define either viewport width or height here, it's approximate to achieve pixel perfect scaling
+        super({
+            viewportFactory: () => new PlatformerViewport({ vpWidth: 128 })
+        });
 
-        // Write your code here, here is an example:
+        // --- world ---
         this.princess = new Princess();
+        this.princess.commandRight();
+        this.princess.commandStop();
 
-        // Let's position the object
         this.princess.x = 64;
-        this.princess.y = 72;
+        this.princess.y = 0;
 
-        // start with camera focused on princess
-        this.focus(this.princess);
-
-        //procedurally place blocks
+        // blocks
         this.blocks = [];
-        for (let i = 0; i < 100; i+= 2) {
-            this.blocks.push(new Tile(i, 79))
+        for (let i = 0; i < 100; i += 1) {
+            this.blocks.push(new Tile(i, 89));
         }
 
-        // this is to gate audio start
+        for (let i = 100; i < 200; i += 1) {
+            this.blocks.push(new Tile(i, 49));
+        }
+
+        // --- camera: start at fixed point, then follow princess after 500ms ---
+        this.focusedOn = null;
+        this.viewport.follow(null);                 // stop follow if your viewport supports it
+        this.focus(64, 81);                         // initial camera point
+
+        this._followTimeout = setTimeout(() => {
+            // switch to following princess
+            this.focusedOn = this.princess;
+            this.viewport.follow(this.princess);
+        }, 500);
+
+        // --- gui ---
         this.audioStarted = false;
 
-        this.guiText = addText("Welcome to \n\nRetrokit 1.0.2", TextType.MESSAGE, '#ffffff');
-        positionText(this.guiText,runtime.settings.SURFACE_WIDTH * .2, runtime.settings.SURFACE_HEIGHT * .05)
+        //this.guiText = addText("Welcome to \n\nRetrokit 1.0.2", TextType.MESSAGE, "#ffffff");
+        //positionText(this.guiText, runtime.settings.SURFACE_WIDTH * 0.2, runtime.settings.SURFACE_HEIGHT * 0.05);
 
-        // Let's define a few buttons, we are okay with them to be invisible, so let's default these params
-        this.leftButton = new DynamicImageButton(-1, -1, null,
-            (button, { pressed }) => {// press is emitted every step: either on click, tap or keyboard key press
-                if (pressed)
-                    this.princess.commandRight();
-                else
-                    this.princess.commandStop();
-
+        // --- inputs ---
+        this.rightButton = new DynamicImageButton(
+            -1, -1, null,
+            (_button, { pressed }) => {
+                if (pressed) this.princess.commandRight();
+                else this.princess.commandStop();
                 this.startAmbient();
             },
-            () => {}, 1, 'KeyD');
-        this.leftButton = new DynamicImageButton(-1, -1, null,
-            (button, { pressed }) => {
-                if (pressed)
-                    this.princess.commandLeft();
-                else
-                    this.princess.commandStop();
+            () => {}, 1, "KeyD"
+        );
 
+        this.leftButton = new DynamicImageButton(
+            -1, -1, null,
+            (_button, { pressed }) => {
+                if (pressed) this.princess.commandLeft();
+                else this.princess.commandStop();
                 this.startAmbient();
             },
-            () => {}, 1, 'KeyA');
+            () => {}, 1, "KeyA"
+        );
+
+        this.upButton = new DynamicImageButton(
+            -1, -1, null,
+            (_button, { pressed }) => {
+                if (pressed) this.princess.commandJump();
+                this.startAmbient();
+            },
+            () => {}, 1, "KeyW"
+        );
     }
 
     startAmbient() {
-        if (this.audioStarted)
-            return;
-
+        if (this.audioStarted) return;
         this.audioStarted = true;
-
         runtime.soundDefinition.ambient.burningDisco.play().then();
     }
 
     onViewportChanged() {
         super.onViewportChanged();
-
-        // Text needs to be repositioned after surface dimensions change
-        if (this.guiText) {
-            positionText(this.guiText,runtime.settings.SURFACE_WIDTH * .2, runtime.settings.SURFACE_HEIGHT * .05);
-        }
-        // optional hook; override per scene if you need
+        // if (this.guiText) {
+        //     positionText(this.guiText, runtime.settings.SURFACE_WIDTH * 0.2, runtime.settings.SURFACE_HEIGHT * 0.05);
+        // }
     }
+
+    onStep() {
+        // DO NOT call super.onStep() if Scene.onStep snaps the camera
+        // super.onStep();
+
+        if (this.focusedOn) {
+            this.viewport.follow(this.focusedOn);
+        }
+        this.viewport.step();
+    }
+
 
     destroy() {
         super.destroy();
 
-        // You should normally destroy all inner objects upon scene destroy,
-        // unless you want to keep them for some reason
-        this.princess.destroy();
+        if (this._followTimeout) {
+            clearTimeout(this._followTimeout);
+            this._followTimeout = null;
+        }
 
-        this.guiText.destroy();
-
-        this.blocks.forEach(block => block.destroy());
+        this.princess?.destroy();
+        this.guiText?.destroy();
+        this.blocks?.forEach(b => b?.destroy());
     }
 }

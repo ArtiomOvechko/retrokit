@@ -333,15 +333,12 @@ class Runtime {
 }
 
 export class Scene extends GameObject {
-    constructor({
-                    vpWidth = null,
-                    vpHeight = null,
-                } = {}) {
+    constructor({viewportFactory} = {}) {
         super(null);
 
         runtime.scene = this;
 
-        this.viewport = new Viewport({ vpWidth, vpHeight });
+        this.viewport = viewportFactory();
 
         this.updateViewport();
 
@@ -407,7 +404,7 @@ export class Settings {
    COLOR_SYSTEM = '#39426b';
 }
 
-class Viewport {
+export class Viewport {
     constructor({
                     vpWidth = null,
                     vpHeight = null,
