@@ -1,1 +1,1 @@
-import * as startup from "src/startup.js";
+import * as startup from "./src/startup.js";

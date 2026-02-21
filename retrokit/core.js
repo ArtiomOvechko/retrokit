@@ -2,6 +2,15 @@ import {generateUUID, OrderedList} from "./utils.js";
 
 export class Sprite {
 
+    /**
+     *
+     * @param path file path relative to the index.html
+     * @param frameWidth single frame width
+     * @param frameHeight single frame width
+     * @param framesPerImage how many steps (game frames) a single image (sprite frame) is displayed. The inverse of image speed.
+     * 1 means each frame is changed every game step
+     * @param totalFrames how many rectangles (frames) to split the image into
+     */
     constructor(path, frameWidth, frameHeight, framesPerImage, totalFrames) {
         this.isLoaded = false;
         this.frameWidth = frameWidth;
@@ -33,6 +42,7 @@ export class GameObject {
     imageSpeed = 1;
     frameNumber = 0;
     alpha = 1;
+    gui = false;
 
     constructor(sprite = null) {
         try {
@@ -121,30 +131,63 @@ export class GameObject {
 
     drawSpriteCentered(sprite, imageIndex, x, y, xScale, yScale) {
         try {
-            const xSign = xScale >= 0 ? 1 : -1;
-            const ySign = yScale >= 0 ? 1 : -1;
+            const scene = runtime.scene;
+            const vp = scene?.viewport;
+
+            // 1) Resolve screen position + final scale
+            let sx = x;
+            let sy = y;
+            let finalXScale = xScale;
+            let finalYScale = yScale;
+
+            if (!this.gui && vp) {
+                const p = vp.worldToScreen(x, y);
+                sx = p.x;
+                sy = p.y;
+
+                // viewport scale multiplies object scale
+                finalXScale = xScale * vp.scale;
+                finalYScale = yScale * vp.scale;
+            }
+
+            // 2) Stable origin in SOURCE pixels (prevents odd/even jitter)
+            const originX = Math.floor(sprite.frameWidth / 2);
+            const originY = Math.floor(sprite.frameHeight / 2);
+
+            // Snap pivot to whole screen pixels for crisp rendering
+            const px = Math.round(sx);
+            const py = Math.round(sy);
+
+            // 3) Draw using pivot transform (stable mirroring)
             runtime.ctx.save();
-            runtime.ctx.translate(xSign < 0 ? Math.ceil(x * 2) : 0, ySign < 0 ? Math.ceil(y * 2) : 0);
-            runtime.ctx.scale(xSign,ySign);
             runtime.ctx.globalAlpha = this.alpha;
+
+            runtime.ctx.translate(px, py);
+            runtime.ctx.scale(finalXScale, finalYScale);
+
             this.beforeDraw(this);
+
             runtime.ctx.drawImage(
                 sprite.image,
                 imageIndex * sprite.frameWidth,
                 0,
                 sprite.frameWidth,
                 sprite.frameHeight,
-                Math.ceil(x - (xScale * sprite.frameWidth) / 2),
-                Math.ceil(y - (yScale * sprite.frameHeight) / 2),
-                Math.ceil(xScale * sprite.frameWidth),
-                Math.ceil(yScale * sprite.frameHeight));
+                -originX,
+                -originY,
+                sprite.frameWidth,
+                sprite.frameHeight
+            );
+
             this.postDraw(this);
             runtime.ctx.restore();
         } catch (e) {
             console.log(e);
-            runtime.ctx.restore();
+            try { runtime.ctx.restore(); } catch {}
         }
     }
+
+    on(event) {}
 
     onStep() {
 
@@ -206,6 +249,7 @@ class Runtime {
             document.onvisibilitychange = this.onVisibilityChange;
             window.onresize = this.onResize;
 
+            this.onResize();
             this.runGame();
 
         }, runtime.settings.LAUNCH_DELAY);
@@ -271,13 +315,79 @@ class Runtime {
 
     }
 
-    onResize = (event) => {
+    onResize = (_event) => {
+        this.settings.SURFACE_HEIGHT = window.innerHeight;
+        this.settings.SURFACE_WIDTH  = window.innerWidth;
 
+        if (this.canvas) {
+            this.canvas.width = this.settings.SURFACE_WIDTH;
+            this.canvas.height = this.settings.SURFACE_HEIGHT;
+            this.ctx = this.canvas.getContext("2d");
+            this.ctx.imageSmoothingEnabled = false;
+        }
+
+        this.gameObjects.forEach((gameObject) => {
+            gameObject.on('updateViewport');
+        });
     }
 }
 
 export class Scene extends GameObject {
-    // in the future there could be some logic shared between all scenes
+    constructor({
+                    vpWidth = null,
+                    vpHeight = null,
+                } = {}) {
+        super(null);
+
+        runtime.scene = this;
+
+        this.viewport = new Viewport({ vpWidth, vpHeight });
+
+        this.updateViewport();
+
+        this.focusedOn = null;
+    }
+
+    focus(objOrX, y = null) {
+        if (typeof objOrX === "object" && objOrX) {
+            if (typeof objOrX === "object")
+                this.focusedOn = objOrX;
+            else
+                this.focusedOn = null;
+
+            this.viewport.focusOn(objOrX.x, objOrX.y);
+        } else {
+            this.focusedOn = null;
+
+            this.viewport.focusOn(Number(objOrX) || 0, Number(y) || 0);
+        }
+    }
+
+    onStep() {
+        super.onStep();
+        if (this.focusedOn) {
+            this.viewport.focusOn(this.focusedOn.x, this.focusedOn.y);
+        }
+    }
+
+    on(event) {
+        super.on(event);
+        if (event === 'updateViewport')
+            this.updateViewport();
+    }
+
+    onViewportChanged() {
+        // optional hook; override per scene if you need
+    }
+
+    updateViewport() {
+        this.viewport.updateForScreen(runtime.settings.SURFACE_WIDTH, runtime.settings.SURFACE_HEIGHT);
+        this.onViewportChanged();
+    }
+
+    destroy() {
+        super.destroy();
+    }
 }
 
 export let runtime = null;
@@ -295,4 +405,67 @@ export class Settings {
    SURFACE_WIDTH = window.innerWidth;
 
    COLOR_SYSTEM = '#39426b';
+}
+
+class Viewport {
+    constructor({
+                    vpWidth = null,
+                    vpHeight = null,
+                } = {}) {
+        this.vpWidth = vpWidth;
+        this.vpHeight = vpHeight;
+
+        // camera center in WORLD units
+        this.cx = 0;
+        this.cy = 0;
+
+        // computed
+        this.scale = 1;         // world->screen multiplier
+        this.logicalWidth = 0;  // computed effective logical size
+        this.logicalHeight = 0;
+    }
+
+    updateForScreen(screenW, screenH) {
+
+        if (this.vpWidth != null && this.vpWidth > 0) {
+
+            const rawScale = screenW / this.vpWidth;
+
+            // integer scale that is >= rawScale
+            this.scale = Math.max(1, Math.ceil(rawScale));
+
+            // now recompute logical size using integer scale
+            this.logicalWidth  = Math.floor(screenW / this.scale);
+            this.logicalHeight = Math.floor(screenH / this.scale);
+
+        }
+        else if (this.vpHeight != null && this.vpHeight > 0) {
+
+            const rawScale = screenH / this.vpHeight;
+
+            this.scale = Math.max(1, Math.ceil(rawScale));
+
+            this.logicalHeight = Math.floor(screenH / this.scale);
+            this.logicalWidth  = Math.floor(screenW / this.scale);
+
+        }
+        else {
+            this.scale = 1;
+            this.logicalWidth  = screenW;
+            this.logicalHeight = screenH;
+        }
+    }
+
+
+    focusOn(x, y) {
+        this.cx = x;
+        this.cy = y;
+    }
+
+    worldToScreen(x, y) {
+        // center camera -> center screen
+        const sx =  this.scale * ((x - this.cx) + Math.floor(this.logicalWidth / 2));
+        const sy = this.scale * ((y - this.cy) + Math.floor(this.logicalHeight / 2));
+        return { x: sx, y: sy };
+    }
 }

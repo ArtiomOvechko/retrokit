@@ -32,6 +32,8 @@ export class Text extends GameObject {
         this.x = x;
         this.y = y;
         this.textType = null;
+
+        this.gui = true;
     }
 
     setTextType(textType) {

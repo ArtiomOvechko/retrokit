@@ -28,7 +28,14 @@ export class InputHandler extends GameObject {
         };
         document.onkeydown = (event) => {
             this.listeners.forEach((listener) => {
-                const listenerCommand = listener.handleKeyInput(event.code);
+                const listenerCommand = listener.handleKeyInput(event.code, { pressed: true });
+                if (listenerCommand)
+                    this.nextCommand = listenerCommand;
+            });
+        };
+        document.onkeyup = (event) => {
+            this.listeners.forEach((listener) => {
+                const listenerCommand = listener.handleKeyInput(event.code, { pressed: false });
                 if (listenerCommand)
                     this.nextCommand = listenerCommand;
             });
@@ -130,15 +137,15 @@ class DynamicButton extends GameObject {
         runtime.inputHandler.addListener(this);
     }
 
-    handleKeyInput(code) {
+    handleKeyInput(code, { pressed }) {
         if (code === this.keyCode && runtime.isObjectRegistered(this)) {
-            return () => this.onPress(this);
+            return () => this.onPress(this, { pressed });
         }
     }
 
     handleTouchEnd(x, y) {
         if (distanceBetween(x, y, this) < this.getClickDistance())
-            return () => this.onPress(this);
+            return () => this.onPress(this,  {pressed: false});
     }
 
     getClickDistance() {
