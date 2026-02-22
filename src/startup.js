@@ -21,6 +21,7 @@ await InitGame(async () => {
     runtime.spritesDefinition = {
         princess: { // A sample sprite, feel free to define your own nesting structure
             walking: new Sprite('./sprites/princess.png', 15, 15, 10, 2),
+            jumping: new Sprite('./sprites/princess_left_jumping.png', 15, 15, 1, 1),
         }, tiles: {
             square: new Sprite('./sprites/square-tile.png', 1, 1, 1, 1),
         }

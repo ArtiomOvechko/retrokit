@@ -4,6 +4,7 @@ import { Princess } from "../gameObjects/princess.js";
 import { PlatformerViewport } from "../gameObjects/PlatformerViewport.js";
 import {buildSteppedStories} from "../helpers/levelBuilders.js";
 import Tile from "../gameObjects/tile.js";
+import {TouchHalfScreenButton} from "../gameObjects/touchHalfScreenButton.js";
 
 export class GameScene extends Scene {
     constructor() {
@@ -78,6 +79,14 @@ export class GameScene extends Scene {
             },
             () => {}, 1, "KeyW"
         );
+
+        this.touchMoveButton = new TouchHalfScreenButton({
+            onLeftDown: () => { this.princess.commandLeft(); this.startAmbient(); },
+            onRightDown: () => { this.princess.commandRight(); this.startAmbient(); },
+            onUp: () => { this.princess.commandStop(); },
+            onDoubleTap: () => { this.princess.commandJump(); this.startAmbient(); },
+        });
+
     }
 
     startAmbient() {
@@ -116,5 +125,7 @@ export class GameScene extends Scene {
         this.leftButton.destroy();
         this.rightButton.destroy();
         this.upButton.destroy();
+
+        this.touchMoveButton.destroy();
     }
 }

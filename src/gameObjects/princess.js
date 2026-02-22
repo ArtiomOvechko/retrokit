@@ -111,6 +111,12 @@ export class Princess extends GameObject {
             this.vx = 0;
             this.imageSpeed = 0;
         }
+
+        if (!this.onGround) {
+            this.sprite = runtime.spritesDefinition.princess.jumping;
+            return;
+        }
+        this.sprite = runtime.spritesDefinition.princess.walking;
     }
 
     applyPhysicsAndCollide() {
