@@ -5,5 +5,7 @@ export default class Tile extends GameObject {
         super(runtime.spritesDefinition.tiles.square);
         this.x = x;
         this.y = y;
+
+        this.depth = 1;
     }
 }

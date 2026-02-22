@@ -24,6 +24,10 @@ await InitGame(async () => {
             jumping: new Sprite('./sprites/princess_left_jumping.png', 15, 15, 1, 1),
         }, tiles: {
             square: new Sprite('./sprites/square-tile.png', 1, 1, 1, 1),
+        }, banners: {
+            firstProject: new Sprite('./sprites/first-job-projects.png', 122, 72, 1, 1),
+            guidePc: new Sprite('./sprites/guide_pc.png', 296, 144, 1, 1),
+            guideTouch: new Sprite('./sprites/guide_touch.png', 296, 144, 1, 1),
         }
     };
 

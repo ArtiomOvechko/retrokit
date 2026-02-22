@@ -1,10 +1,12 @@
 import { runtime, Scene } from "../../retrokit/core.js";
 import { DynamicImageButton } from "../../retrokit/io/button.js";
 import { Princess } from "../gameObjects/princess.js";
-import { PlatformerViewport } from "../gameObjects/PlatformerViewport.js";
+import { PlatformerViewport } from "../gameObjects/platformerViewport.js";
 import {buildSteppedStories} from "../helpers/levelBuilders.js";
 import Tile from "../gameObjects/tile.js";
 import {TouchHalfScreenButton} from "../gameObjects/touchHalfScreenButton.js";
+import {Banner} from "../gameObjects/banner.js";
+import {isMobile} from "../helpers/browserHelpers.js";
 
 export class GameScene extends Scene {
     constructor() {
@@ -22,12 +24,15 @@ export class GameScene extends Scene {
         this.princess.y = 0;
 
         const { solidTiles, traceTiles } = buildSteppedStories([
-            new Tile(0,0),
-            new Tile(0,0),
+            new Banner(isMobile()
+                ? runtime.spritesDefinition.banners.guideTouch
+                : runtime.spritesDefinition.banners.guidePc,
+                .2),
+            new Banner(runtime.spritesDefinition.banners.firstProject),
             new Tile(0,0),
             new Tile(0,0),
         ], 0, 89, {
-            storyWidth: 128,
+            storyWidth: 138,
             wallHeight: 200,
             objLift: 40,
             traceInterval: 3,
@@ -51,7 +56,7 @@ export class GameScene extends Scene {
         this.audioStarted = false;
 
         // --- inputs ---
-        this.rightButton = new DynamicImageButton(
+        this.rightDButton = new DynamicImageButton(
             -1, -1, null,
             (_button, { pressed }) => {
                 if (pressed) this.princess.commandRight();
@@ -61,7 +66,7 @@ export class GameScene extends Scene {
             () => {}, 1, "KeyD"
         );
 
-        this.leftButton = new DynamicImageButton(
+        this.leftAButton = new DynamicImageButton(
             -1, -1, null,
             (_button, { pressed }) => {
                 if (pressed) this.princess.commandLeft();
@@ -71,13 +76,42 @@ export class GameScene extends Scene {
             () => {}, 1, "KeyA"
         );
 
-        this.upButton = new DynamicImageButton(
+        this.upWButton = new DynamicImageButton(
             -1, -1, null,
             (_button, { pressed }) => {
                 if (pressed) this.princess.commandJump();
                 this.startAmbient();
             },
             () => {}, 1, "KeyW"
+        );
+
+        this.rightButton = new DynamicImageButton(
+            -1, -1, null,
+            (_button, { pressed }) => {
+                if (pressed) this.princess.commandRight();
+                else this.princess.commandStop();
+                this.startAmbient();
+            },
+            () => {}, 1, "ArrowRight"
+        );
+
+        this.leftButton = new DynamicImageButton(
+            -1, -1, null,
+            (_button, { pressed }) => {
+                if (pressed) this.princess.commandLeft();
+                else this.princess.commandStop();
+                this.startAmbient();
+            },
+            () => {}, 1, "ArrowLeft"
+        );
+
+        this.upButton = new DynamicImageButton(
+            -1, -1, null,
+            (_button, { pressed }) => {
+                if (pressed) this.princess.commandJump();
+                this.startAmbient();
+            },
+            () => {}, 1, "ArrowUp"
         );
 
         this.touchMoveButton = new TouchHalfScreenButton({
@@ -97,6 +131,15 @@ export class GameScene extends Scene {
 
     onViewportChanged() {
         super.onViewportChanged();
+    }
+
+    updateViewport() {
+        if (runtime.settings.SURFACE_WIDTH > runtime.settings.SURFACE_HEIGHT) {
+            this.viewport.vpWidth = 256;
+        } else {
+            this.viewport.vpHeight = 128;
+        }
+        super.updateViewport();
     }
 
     onStep() {
@@ -125,6 +168,9 @@ export class GameScene extends Scene {
         this.leftButton.destroy();
         this.rightButton.destroy();
         this.upButton.destroy();
+        this.leftAButton.destroy();
+        this.rightDButton.destroy();
+        this.upWButton.destroy();
 
         this.touchMoveButton.destroy();
     }
