@@ -53,11 +53,14 @@ export class Sound {
         runtime.logger.log(`${this.soundFilePath}: Sound failed. Reason: ${reason}`);
     }
 
-    async play() {
+    async play({loop = true}) {
         try {
             await this.load();
 
             const source = this.context.createBufferSource(); // creates a sound source
+
+            source.loop = loop;
+
             source.buffer = this.buffer;                    // tell the source which sound to play
             source.connect(this.context.destination);       // connect the source to the context's destination (the speakers)
             source.start(0);                          // play the source now

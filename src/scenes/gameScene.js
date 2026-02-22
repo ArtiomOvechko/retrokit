@@ -1,9 +1,9 @@
 import { runtime, Scene } from "../../retrokit/core.js";
 import { DynamicImageButton } from "../../retrokit/io/button.js";
 import { Princess } from "../gameObjects/princess.js";
-import Tile from "../gameObjects/tile.js";
-import { addText, positionText, TextType } from "../../retrokit/io/text.js";
 import { PlatformerViewport } from "../gameObjects/PlatformerViewport.js";
+import {buildSteppedStories} from "../helpers/levelBuilders.js";
+import Tile from "../gameObjects/tile.js";
 
 export class GameScene extends Scene {
     constructor() {
@@ -15,24 +15,31 @@ export class GameScene extends Scene {
         this.princess = new Princess();
         this.princess.commandRight();
         this.princess.commandStop();
+        this.princess.depth = -1;
 
         this.princess.x = 64;
         this.princess.y = 0;
 
-        // blocks
-        this.blocks = [];
-        for (let i = 0; i < 100; i += 1) {
-            this.blocks.push(new Tile(i, 89));
-        }
+        const { solidTiles, traceTiles } = buildSteppedStories([
+            new Tile(0,0),
+            new Tile(0,0),
+            new Tile(0,0),
+            new Tile(0,0),
+        ], 0, 89, {
+            storyWidth: 128,
+            wallHeight: 200,
+            objLift: 40,
+            traceInterval: 3,
+        });
 
-        for (let i = 100; i < 200; i += 1) {
-            this.blocks.push(new Tile(i, 49));
-        }
+        this.blocks = solidTiles;
+
+        this.traceTiles = traceTiles;
 
         // --- camera: start at fixed point, then follow princess after 500ms ---
         this.focusedOn = null;
-        this.viewport.follow(null);                 // stop follow if your viewport supports it
-        this.focus(64, 81);                         // initial camera point
+        this.viewport.follow(null);
+        this.focus(64, 81);
 
         this._followTimeout = setTimeout(() => {
             // switch to following princess
@@ -40,11 +47,7 @@ export class GameScene extends Scene {
             this.viewport.follow(this.princess);
         }, 500);
 
-        // --- gui ---
         this.audioStarted = false;
-
-        //this.guiText = addText("Welcome to \n\nRetrokit 1.0.2", TextType.MESSAGE, "#ffffff");
-        //positionText(this.guiText, runtime.settings.SURFACE_WIDTH * 0.2, runtime.settings.SURFACE_HEIGHT * 0.05);
 
         // --- inputs ---
         this.rightButton = new DynamicImageButton(
@@ -80,14 +83,11 @@ export class GameScene extends Scene {
     startAmbient() {
         if (this.audioStarted) return;
         this.audioStarted = true;
-        runtime.soundDefinition.ambient.burningDisco.play().then();
+        runtime.soundDefinition.ambient.burningDisco.play({loop: true}).then();
     }
 
     onViewportChanged() {
         super.onViewportChanged();
-        // if (this.guiText) {
-        //     positionText(this.guiText, runtime.settings.SURFACE_WIDTH * 0.2, runtime.settings.SURFACE_HEIGHT * 0.05);
-        // }
     }
 
     onStep() {
@@ -110,7 +110,11 @@ export class GameScene extends Scene {
         }
 
         this.princess?.destroy();
-        this.guiText?.destroy();
         this.blocks?.forEach(b => b?.destroy());
+        this.traceTiles?.forEach(t => t.destroy());
+
+        this.leftButton.destroy();
+        this.rightButton.destroy();
+        this.upButton.destroy();
     }
 }
