@@ -40,7 +40,7 @@ export class Princess extends GameObject {
         super(runtime.spritesDefinition.princess.walking);
 
         this.isMoving = false;
-        this.speed = 1.5;
+        this.speed = 6.5;
 
         // --- Jump / physics ---
         this.vx = 0;
@@ -57,6 +57,8 @@ export class Princess extends GameObject {
 
         // keep 0 for flush contact; any padding creates visible gap
         this.hitPad = 0;
+
+        this.setScale(.5);
     }
 
     // --- Commands ---
@@ -106,17 +108,11 @@ export class Princess extends GameObject {
     handleMovement() {
         if (this.isMoving) {
             this.vx = -this.xScale * this.speed;
-            this.imageSpeed = 1;
+            this.sprite = runtime.spritesDefinition.emil.walking;
         } else {
             this.vx = 0;
-            this.imageSpeed = 0;
+            this.sprite = runtime.spritesDefinition.emil.idle;
         }
-
-        if (!this.onGround) {
-            this.sprite = runtime.spritesDefinition.princess.jumping;
-            return;
-        }
-        this.sprite = runtime.spritesDefinition.princess.walking;
     }
 
     applyPhysicsAndCollide() {

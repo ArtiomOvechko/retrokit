@@ -2,7 +2,7 @@ import Tile from "../gameObjects/tile.js";
 
 export function buildSteppedStories(objects, startX, startY, {
     storyWidth = 128,
-    storyRiseMin = 30,
+    storyRiseMin = 40,
     storyRiseMax = 40,
 
     wallHeight = 200,

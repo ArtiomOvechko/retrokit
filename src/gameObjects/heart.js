@@ -1,11 +1,12 @@
 import {GameObject, runtime} from "../../retrokit/core.js";
 
-export default class Tile extends GameObject {
+export class Heart extends GameObject {
     constructor(x, y) {
-        super(runtime.spritesDefinition.tiles.square);
+        super(runtime.spritesDefinition.misc.heart);
+
         this.x = x;
         this.y = y;
 
-        this.setDepth(100);
+        this.setScale(.5);
     }
 }

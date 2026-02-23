@@ -3,10 +3,13 @@ import { DynamicImageButton } from "../../retrokit/io/button.js";
 import { Princess } from "../gameObjects/princess.js";
 import { PlatformerViewport } from "../gameObjects/platformerViewport.js";
 import {buildSteppedStories} from "../helpers/levelBuilders.js";
-import Tile from "../gameObjects/tile.js";
 import {TouchHalfScreenButton} from "../gameObjects/touchHalfScreenButton.js";
 import {Banner} from "../gameObjects/banner.js";
 import {isMobile} from "../helpers/browserHelpers.js";
+import {Artem} from "../gameObjects/artem.js";
+import {Heart} from "../gameObjects/heart.js";
+import {Yuliia} from "../gameObjects/yuliia.js";
+import {EmilText} from "../gameObjects/emilText.js";
 
 export class GameScene extends Scene {
     constructor() {
@@ -28,11 +31,19 @@ export class GameScene extends Scene {
                 ? runtime.spritesDefinition.banners.guideTouch
                 : runtime.spritesDefinition.banners.guidePc,
                 .2),
+            new Banner(runtime.spritesDefinition.banners.itsMe, .4),
             new Banner(runtime.spritesDefinition.banners.firstProject),
-            new Tile(0,0),
-            new Tile(0,0),
+            new Banner(runtime.spritesDefinition.banners.aws, .22),
+            new Banner(runtime.spritesDefinition.banners.font, .22),
+            new Banner(runtime.spritesDefinition.banners.purolator, .48),
+            new Banner(runtime.spritesDefinition.banners.ideals, .22),
+            new Banner(runtime.spritesDefinition.banners.retrogotchi, .24),
+            new Banner(runtime.spritesDefinition.banners.votum, .22),
+            new Banner(runtime.spritesDefinition.banners.princessventure, .22),
+            new Banner(runtime.spritesDefinition.banners.retrokit, .24),
+            new Banner(runtime.spritesDefinition.banners.goodlang, .24),
         ], 0, 89, {
-            storyWidth: 138,
+            storyWidth: 158,
             wallHeight: 200,
             objLift: 40,
             traceInterval: 3,
@@ -40,7 +51,8 @@ export class GameScene extends Scene {
 
         this.blocks = solidTiles;
 
-        this.traceTiles = traceTiles;
+        this.objects = [];
+        this.objects = this.objects.concat(traceTiles);
 
         // --- camera: start at fixed point, then follow princess after 500ms ---
         this.focusedOn = null;
@@ -56,71 +68,78 @@ export class GameScene extends Scene {
         this.audioStarted = false;
 
         // --- inputs ---
-        this.rightDButton = new DynamicImageButton(
-            -1, -1, null,
-            (_button, { pressed }) => {
-                if (pressed) this.princess.commandRight();
-                else this.princess.commandStop();
-                this.startAmbient();
-            },
-            () => {}, 1, "KeyD"
-        );
+        this.objects = this.objects.concat([
+            new EmilText(55, 70),
 
-        this.leftAButton = new DynamicImageButton(
-            -1, -1, null,
-            (_button, { pressed }) => {
-                if (pressed) this.princess.commandLeft();
-                else this.princess.commandStop();
-                this.startAmbient();
-            },
-            () => {}, 1, "KeyA"
-        );
+            new Heart(190, -1),
+            new Heart(190, 5),
+            new Heart(190, 12),
+            new Heart(190, 18),
+            new Heart(190, 24),
+            new Heart(190, 30),
 
-        this.upWButton = new DynamicImageButton(
-            -1, -1, null,
-            (_button, { pressed }) => {
-                if (pressed) this.princess.commandJump();
-                this.startAmbient();
-            },
-            () => {}, 1, "KeyW"
-        );
+            new Artem(250, 25),
+            new Yuliia(1362, -255),
 
-        this.rightButton = new DynamicImageButton(
-            -1, -1, null,
-            (_button, { pressed }) => {
-                if (pressed) this.princess.commandRight();
-                else this.princess.commandStop();
-                this.startAmbient();
-            },
-            () => {}, 1, "ArrowRight"
-        );
-
-        this.leftButton = new DynamicImageButton(
-            -1, -1, null,
-            (_button, { pressed }) => {
-                if (pressed) this.princess.commandLeft();
-                else this.princess.commandStop();
-                this.startAmbient();
-            },
-            () => {}, 1, "ArrowLeft"
-        );
-
-        this.upButton = new DynamicImageButton(
-            -1, -1, null,
-            (_button, { pressed }) => {
-                if (pressed) this.princess.commandJump();
-                this.startAmbient();
-            },
-            () => {}, 1, "ArrowUp"
-        );
-
-        this.touchMoveButton = new TouchHalfScreenButton({
-            onLeftDown: () => { this.princess.commandLeft(); this.startAmbient(); },
-            onRightDown: () => { this.princess.commandRight(); this.startAmbient(); },
-            onUp: () => { this.princess.commandStop(); },
-            onDoubleTap: () => { this.princess.commandJump(); this.startAmbient(); },
-        });
-
+            new DynamicImageButton(
+                -1, -1, null,
+                (_button, { pressed }) => {
+                    if (pressed) this.princess.commandRight();
+                    else this.princess.commandStop();
+                    this.startAmbient();
+                },
+                () => {}, 1, "KeyD"
+            ),
+            new DynamicImageButton(
+                -1, -1, null,
+                (_button, { pressed }) => {
+                    if (pressed) this.princess.commandLeft();
+                    else this.princess.commandStop();
+                    this.startAmbient();
+                },
+                () => {}, 1, "KeyA"
+            ),
+            new DynamicImageButton(
+                -1, -1, null,
+                (_button, { pressed }) => {
+                    if (pressed) this.princess.commandJump();
+                    this.startAmbient();
+                },
+                () => {}, 1, "KeyW"
+            ),
+            new DynamicImageButton(
+                -1, -1, null,
+                (_button, { pressed }) => {
+                    if (pressed) this.princess.commandRight();
+                    else this.princess.commandStop();
+                    this.startAmbient();
+                },
+                () => {}, 1, "ArrowRight"
+            ),
+            new DynamicImageButton(
+                -1, -1, null,
+                (_button, { pressed }) => {
+                    if (pressed) this.princess.commandLeft();
+                    else this.princess.commandStop();
+                    this.startAmbient();
+                },
+                () => {}, 1, "ArrowLeft"
+            ),
+            new DynamicImageButton(
+                -1, -1, null,
+                (_button, { pressed }) => {
+                    if (pressed) this.princess.commandJump();
+                    this.startAmbient();
+                },
+                () => {}, 1, "ArrowUp"
+            ),
+            new TouchHalfScreenButton({
+                onLeftDown: () => { this.princess.commandLeft(); this.startAmbient(); },
+                onRightDown: () => { this.princess.commandRight(); this.startAmbient(); },
+                onUp: () => { this.princess.commandStop(); },
+                onDoubleTap: () => { this.princess.commandJump(); this.startAmbient(); },
+            })
+        ]);
     }
 
     startAmbient() {
@@ -163,15 +182,6 @@ export class GameScene extends Scene {
 
         this.princess?.destroy();
         this.blocks?.forEach(b => b?.destroy());
-        this.traceTiles?.forEach(t => t.destroy());
-
-        this.leftButton.destroy();
-        this.rightButton.destroy();
-        this.upButton.destroy();
-        this.leftAButton.destroy();
-        this.rightDButton.destroy();
-        this.upWButton.destroy();
-
-        this.touchMoveButton.destroy();
+        this.objects?.forEach(b => b?.destroy());
     }
 }
