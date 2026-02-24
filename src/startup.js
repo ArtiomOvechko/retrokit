@@ -22,6 +22,8 @@ await InitGame(async () => {
         misc: {
             heart: new Sprite('./sprites/heart.png', 16, 16, 4, 6),
             emilText: new Sprite('./sprites/emil-text.png', 204 , 33, 1, 1),
+            buttonToLearnMore: new Sprite('./sprites/button-learn-more.png', 148 , 27, 1, 1),
+            buttonToLearnThenSome: new Sprite('./sprites/button-learn-then-some.png', 148 , 27, 1, 1),
         },
         yuliia: {
             idle: new Sprite('./sprites/yuliia-idle.png', 32, 48, 6, 5),

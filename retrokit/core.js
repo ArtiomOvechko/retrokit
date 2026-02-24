@@ -210,7 +210,7 @@ class Logger {
     log(message) {
         const messageString = message.toString();
 
-        console.log(messageString);
+        //console.log(messageString);
     }
 }
 

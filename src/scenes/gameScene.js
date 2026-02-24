@@ -10,12 +10,15 @@ import {Artem} from "../gameObjects/artem.js";
 import {Heart} from "../gameObjects/heart.js";
 import {Yuliia} from "../gameObjects/yuliia.js";
 import {EmilText} from "../gameObjects/emilText.js";
+import {ImageButton} from "../gameObjects/imageButton.js";
 
 export class GameScene extends Scene {
     constructor() {
         super({
             viewportFactory: () => new PlatformerViewport({ vpWidth: 128 })
         });
+
+        this.hoveredButton = null;
 
         // --- world ---
         this.princess = new Princess();
@@ -80,6 +83,55 @@ export class GameScene extends Scene {
 
             new Artem(250, 25),
             new Yuliia(1362, -255),
+
+            new ImageButton(
+                1141, -222, runtime.spritesDefinition.misc.buttonToLearnMore,
+                (btn, { pressed }) => {
+                    window.open("https://retrogotchi.com/", "_blank");
+                },
+                () => {},
+                .24,
+            ),
+            new ImageButton(
+                1331, -250, runtime.spritesDefinition.misc.buttonToLearnMore,
+                (btn, { pressed }) => {
+                    window.open("https://votum.beampie.com/", "_blank");
+                },
+                () => {},
+                .24,
+            ),
+            new ImageButton(
+                1470, -282, runtime.spritesDefinition.misc.buttonToLearnMore,
+                (btn, { pressed }) => {
+                    window.open("https://www.youtube.com/watch?v=vxuVQkuiCGk", "_blank");
+                },
+                () => {},
+                .24,
+            ),
+            new ImageButton(
+                1645, -332, runtime.spritesDefinition.misc.buttonToLearnMore,
+                (btn, { pressed }) => {
+                    window.open("https://github.com/ArtiomOvechko/retrokit", "_blank");
+                },
+                () => {},
+                .24,
+            ),
+            new ImageButton(
+                1802, -378, runtime.spritesDefinition.misc.buttonToLearnMore,
+                (btn, { pressed }) => {
+                    window.open("https://goodlang.app/welcome", "_blank");
+                },
+                () => {},
+                .24,
+            ),
+            new ImageButton(
+                1842, -378, runtime.spritesDefinition.misc.buttonToLearnThenSome,
+                (btn, { pressed }) => {
+                    window.open("https://goodlang.app/marathon", "_blank");
+                },
+                () => {},
+                .24,
+            ),
 
             new DynamicImageButton(
                 -1, -1, null,

@@ -7,6 +7,6 @@ export class EmilText extends GameObject {
         this.x = x;
         this.y = y;
 
-        this.setScale(.5);
+        this.setScale(.48);
     }
 }

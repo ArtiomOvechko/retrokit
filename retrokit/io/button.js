@@ -15,17 +15,19 @@ export class InputHandler extends GameObject {
 
         document.onclick = event => {
             runtime.logger.log('document click');
-            this._handleClick(event);
+            this._handleClick(event, true);
+        };
+        document.onpointerdown = event => {
+            runtime.logger.log('document pointer down');
+            this._handleClick(event, false);
         };
         document.onmousemove = (event) => {
             this._handleMouseMove(event);
         };
-        document.ontouchstart = (event) => {
-            this._handleTouch(event);
-        }
         document.ontouchend = (event) => {
+            this._handleTouchEnd(event);
             event.preventDefault();
-        };
+        }
         document.onkeydown = (event) => {
             this.listeners.forEach((listener) => {
                 const listenerCommand = listener.handleKeyInput(event.code, { pressed: true });
@@ -42,35 +44,49 @@ export class InputHandler extends GameObject {
         };
     }
 
-    _handleTouch(event) {
+    _handleTouchEnd(event) {
         let leftOffset = document.getElementById('game-surface').getBoundingClientRect().left;
         let topOffset = document.getElementById('game-surface').getBoundingClientRect().top;
         let touchSurfaceX = event.changedTouches[0].clientX - leftOffset;
         let touchSurfaceY = event.changedTouches[0].clientY - topOffset;
 
-        this.listeners.forEach((listener) => {
-            const listenerCommand = listener.handleTouchEnd(touchSurfaceX, touchSurfaceY);
-            if (listenerCommand) {
-                runtime.logger?.log(`generic listener button press: ${listener?.buttonType}`);
-                this.nextCommand = listenerCommand;
-            }
-        });
+        try {
+            this.listeners.forEach((listener) => {
+                const listenerCommand = listener.handleTouchEnd(touchSurfaceX, touchSurfaceY);
+                if (listenerCommand) {
+                    runtime.logger?.log(`generic listener button press: ${listener?.buttonType}`);
+                    this.nextCommand = listenerCommand;
+                }
+
+                if (listener.stopPropagation(touchSurfaceX, touchSurfaceY))
+                    throw 'stop propagation';
+            });
+        } catch {}
     }
 
-    _handleClick(event) {
+    _handleClick(event, end = false) {
         let leftOffset = document.getElementById('game-surface').getBoundingClientRect().left;
         let topOffset = document.getElementById('game-surface').getBoundingClientRect().top;
         let touchSurfaceX = event.clientX - leftOffset;
         let touchSurfaceY = event.clientY - topOffset;
 
-        this.listeners.forEach((listener) => {
-            runtime.logger.log(`generic listener click attempt: ${listener?.buttonType}`);
-            const listenerCommand = listener.handleTouchEnd(touchSurfaceX, touchSurfaceY);
-            if (listenerCommand) {
-                runtime.logger?.log(`generic listener click: ${listener?.buttonType}`);
-                this.nextCommand = listenerCommand;
-            }
-        });
+        try {
+            this.listeners.forEach((listener) => {
+                runtime.logger.log(`generic listener click attempt: ${listener?.buttonType}`);
+
+                const listenerCommand = end
+                    ? listener.handleTouchEnd(touchSurfaceX, touchSurfaceY)
+                    : listener.handleTouch(touchSurfaceX, touchSurfaceY);
+
+                if (listenerCommand) {
+                    runtime.logger?.log(`generic listener click: ${listener?.buttonType}`);
+                    this.nextCommand = listenerCommand;
+                }
+
+                if (listener.stopPropagation(touchSurfaceX, touchSurfaceY))
+                    throw 'stop propagation';
+            });
+        } catch {}
     }
 
     _handleMouseMove(event) {
@@ -141,6 +157,15 @@ class DynamicButton extends GameObject {
         if (code === this.keyCode && runtime.isObjectRegistered(this)) {
             return () => this.onPress(this, { pressed });
         }
+    }
+
+    stopPropagation(x, y) {
+        return false;
+    }
+
+    handleTouch(x, y) {
+        if (distanceBetween(x, y, this) < this.getClickDistance())
+            return () => this.onPress(this,  {pressed: true});
     }
 
     handleTouchEnd(x, y) {
