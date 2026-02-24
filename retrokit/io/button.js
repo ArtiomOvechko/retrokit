@@ -179,7 +179,7 @@ class DynamicButton extends GameObject {
     }
 
     handleMouseMove(x, y) {
-        return () => this.onMouseMove(this, x, y);
+        return () => this.onMouseMove ? this.onMouseMove(this, x, y) : null;
     }
 
     destroy() {

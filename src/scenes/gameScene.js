@@ -197,7 +197,9 @@ export class GameScene extends Scene {
     startAmbient() {
         if (this.audioStarted) return;
         this.audioStarted = true;
-        runtime.soundDefinition.ambient.burningDisco.play({loop: true}).then();
+        setTimeout(() => {
+            runtime.soundDefinition.ambient.burningDisco.play({loop: true}).then();
+        }, 1000);
     }
 
     onViewportChanged() {

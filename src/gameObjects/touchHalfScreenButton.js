@@ -56,6 +56,8 @@ export class TouchHalfScreenButton extends DynamicImageButton {
         return x >= runtime.settings.SURFACE_WIDTH / 2;
     }
 
+    onDraw() {}
+
     _isDoubleTap(now, x, y) {
         if (!this._lastTapAt) return false;
 

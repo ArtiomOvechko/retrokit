@@ -68,6 +68,8 @@ await InitGame(async () => {
             burningDisco: new Sound('./audio/sound_ambient_burning_disco.wav'),
         }
     }
+
+    await runtime.soundDefinition.ambient.burningDisco.load();
 }, (settings) => {
     settings.GAME_STEP_SPEED = 20; // inverse of how fast the whole game is running (in ms, how often each game refresh happens)
 
