@@ -35,16 +35,16 @@ export class GameScene extends Scene {
                 : runtime.spritesDefinition.banners.guidePc,
                 .2),
             new Banner(runtime.spritesDefinition.banners.itsMe, .4),
-            new Banner(runtime.spritesDefinition.banners.firstProject),
-            new Banner(runtime.spritesDefinition.banners.aws, .22),
-            new Banner(runtime.spritesDefinition.banners.font, .22),
-            new Banner(runtime.spritesDefinition.banners.purolator, .48),
-            new Banner(runtime.spritesDefinition.banners.ideals, .22),
+            //new Banner(runtime.spritesDefinition.banners.firstProject),
+            //new Banner(runtime.spritesDefinition.banners.aws, .22),
+            //ew Banner(runtime.spritesDefinition.banners.purolator, .48),
+            //new Banner(runtime.spritesDefinition.banners.ideals, .22),
             new Banner(runtime.spritesDefinition.banners.retrogotchi, .24),
             new Banner(runtime.spritesDefinition.banners.votum, .22),
             new Banner(runtime.spritesDefinition.banners.princessventure, .22),
-            new Banner(runtime.spritesDefinition.banners.retrokit, .24),
             new Banner(runtime.spritesDefinition.banners.goodlang, .24),
+            new Banner(runtime.spritesDefinition.banners.retrokit, .24),
+            new Banner(runtime.spritesDefinition.banners.font, .22),
         ], 0, 89, {
             storyWidth: 158,
             wallHeight: 200,
@@ -82,10 +82,10 @@ export class GameScene extends Scene {
             new Heart(190, 30),
 
             new Artem(250, 25),
-            new Yuliia(1362, -255),
+            new Yuliia(572, -55),
 
             new ImageButton(
-                1141, -222, runtime.spritesDefinition.misc.buttonToLearnMore,
+                375, -11, runtime.spritesDefinition.misc.buttonToLearnMore,
                 (btn, { pressed }) => {
                     window.open("https://retrogotchi.com/", "_blank");
                 },
@@ -93,7 +93,7 @@ export class GameScene extends Scene {
                 .24,
             ),
             new ImageButton(
-                1331, -250, runtime.spritesDefinition.misc.buttonToLearnMore,
+                541, -51, runtime.spritesDefinition.misc.buttonToLearnMore,
                 (btn, { pressed }) => {
                     window.open("https://votum.beampie.com/", "_blank");
                 },
@@ -101,7 +101,7 @@ export class GameScene extends Scene {
                 .24,
             ),
             new ImageButton(
-                1470, -282, runtime.spritesDefinition.misc.buttonToLearnMore,
+                680, -80, runtime.spritesDefinition.misc.buttonToLearnMore,
                 (btn, { pressed }) => {
                     window.open("https://www.youtube.com/watch?v=vxuVQkuiCGk", "_blank");
                 },
@@ -109,15 +109,7 @@ export class GameScene extends Scene {
                 .24,
             ),
             new ImageButton(
-                1645, -332, runtime.spritesDefinition.misc.buttonToLearnMore,
-                (btn, { pressed }) => {
-                    window.open("https://github.com/ArtiomOvechko/retrokit", "_blank");
-                },
-                () => {},
-                .24,
-            ),
-            new ImageButton(
-                1802, -378, runtime.spritesDefinition.misc.buttonToLearnMore,
+                853, -137, runtime.spritesDefinition.misc.buttonToLearnMore,
                 (btn, { pressed }) => {
                     window.open("https://goodlang.app/welcome", "_blank");
                 },
@@ -125,9 +117,25 @@ export class GameScene extends Scene {
                 .24,
             ),
             new ImageButton(
-                1842, -378, runtime.spritesDefinition.misc.buttonToLearnThenSome,
+                884, -129, runtime.spritesDefinition.misc.buttonToLearnThenSome,
                 (btn, { pressed }) => {
-                    window.open("https://goodlang.app/marathon", "_blank");
+                    window.open("https://goodlang.app/greetings", "_blank");
+                },
+                () => {},
+                .24,
+            ),
+            new ImageButton(
+                1012, -173, runtime.spritesDefinition.misc.buttonToLearnMore,
+                (btn, { pressed }) => {
+                    window.open("https://github.com/ArtiomOvechko/retrokit", "_blank");
+                },
+                () => {},
+                .24,
+            ),
+            new ImageButton(
+                1172, -215, runtime.spritesDefinition.misc.buttonToLearnMore,
+                (btn, { pressed }) => {
+                    window.open("https://github.com/ArtiomOvechko/retrokit/blob/main/fonts/BeampiePixelV77_rc2.otf", "_blank");
                 },
                 () => {},
                 .24,
